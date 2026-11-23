@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: telegram-file-access-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+      - key: DESTRUCT_TIME_SECONDS
+        value: "300"
+      - key: WATERMARK_TEXT
+        value: "Made by @VIJAYEDITOR77 on Telegram"
+      - key: WATERMARK_USERNAME
+        value: "@VIJAYEDITOR77"
