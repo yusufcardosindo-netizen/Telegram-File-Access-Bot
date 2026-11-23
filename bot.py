@@ -596,6 +596,14 @@ async def resume_pending_timers(application: Application):
 async def post_init(application: Application):
     """Actions performed once the bot connects."""
     database.init_db()
+    # Explicitly purge any old Axkush files from the database
+    try:
+        with database.get_connection() as conn:
+            conn.execute("DELETE FROM files WHERE file_name LIKE '%Axkush%'")
+            conn.commit()
+    except Exception as e:
+        logger.warning(f"Cleanup notice: {e}")
+
     # Always ensure files directory is scanned and Cavalca_Main_CC.ffx is registered as default
     if FILES_DIR.exists():
         cavalca = FILES_DIR / "Cavalca_Main_CC.ffx"
