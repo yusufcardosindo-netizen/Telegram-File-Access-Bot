@@ -596,13 +596,18 @@ async def resume_pending_timers(application: Application):
 async def post_init(application: Application):
     """Actions performed once the bot connects."""
     database.init_db()
-    # Auto-register local files if no default file is configured (e.g. fresh cloud deploy on Render)
-    if not database.get_default_file() and FILES_DIR.exists():
-        for candidate in sorted(FILES_DIR.iterdir()):
-            if candidate.is_file():
-                import register_local_file
-                register_local_file.register_file(str(candidate), is_default=True)
-                break
+    # Always ensure files directory is scanned and Cavalca_Main_CC.ffx is registered as default
+    if FILES_DIR.exists():
+        cavalca = FILES_DIR / "Cavalca_Main_CC.ffx"
+        if cavalca.exists():
+            import register_local_file
+            register_local_file.register_file(str(cavalca), is_default=True)
+        elif not database.get_default_file():
+            for candidate in sorted(FILES_DIR.iterdir()):
+                if candidate.is_file():
+                    import register_local_file
+                    register_local_file.register_file(str(candidate), is_default=True)
+                    break
     await resume_pending_timers(application)
     bot_info = await application.bot.get_me()
     logger.info(f"Bot started successfully as @{bot_info.username}")
